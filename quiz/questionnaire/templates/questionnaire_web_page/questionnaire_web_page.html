@@ -1,0 +1,31 @@
+{% extends 'BASE_TEMPLATE.html' %}
+
+
+{% block menu %}
+<ol>
+    <li>
+        <a href="/">Главная</a>
+    </li>
+</ol>
+
+{% endblock menu %}
+{% block forms %}
+ <fieldset style="border:3px #00B344  double; border-radius:5px; width:700px; text-align:left; padding: 5px 0 5px 15px; ">
+        <legend>Список вопросов</legend>
+        <form method="POST">
+            {% csrf_token %}
+            <div>
+
+            </div>
+                {% for k, v in data %}
+                    {{k}}. {{v.choice_field.label}}<br>
+                    {{v}}<br>
+                {% endfor %}
+            <button class="button" style="vertical-align:middle"><span>Start </span></button>
+
+        </form>
+    </fieldset>
+{% endblock forms %}
+{% block content%}
+
+{% endblock content%}
