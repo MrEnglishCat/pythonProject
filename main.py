@@ -110,9 +110,11 @@ def write_dataframe_to_excel(df_key, df_answer, structure, file_name, sheet_name
     :return:
     '''
     # line_answer[14:23]
-    for line_id in range(len(df_key)):
-        df_key.values[line_id][14:23] = df_answer.values[line_id][14:23]
+    buffer_df_key = df_key.values.tolist()
 
+    for line_id in range(len(df_key)):
+        buffer_df_key[line_id][14:23] = df_answer.values[line_id][14:23]
+    df_key = pd.DataFrame(buffer_df_key)
     df_key.to_excel(file_name, 'Ключ', index=False, header=False, merge_cells=True)
 
 
