@@ -1,4 +1,6 @@
 import json
+
+import pandas
 import pandas as pd
 from copy import deepcopy
 
@@ -91,7 +93,7 @@ def get_question_groups(file_name:str, sheets:list):
                 }
             )
             structure[group_name][claster_name][question_group].update(buffer)
-
+    return structure, df_key, df_answers
 
 def write_to_json(data:dict, file_name):
     '''
@@ -104,3 +106,21 @@ def write_to_json(data:dict, file_name):
         json.dump(data, f_json, ensure_ascii=False, indent=3)
 
 
+def write_dataframe_to_excel(df_key, df_answer, structure, file_name, sheet_name):
+    '''
+
+    :param df_key: pandas.DataFrame()
+    :param file_name: 'template.xlsx'
+    :param sheet_name: 'Ключ'
+    :return:
+    '''
+    # line_answer[14:23]
+    d = df_key.to_numpy()
+    for line_id in range(len(df_key)):
+        df_key.values[line_id][14:23] = df_answer[line_id][14:23]
+
+    df_key.to_excel(file_name, 'Ключ', index=False, header=False, merge_cells=True)
+
+struncture, df_key, df_answer = get_question_groups('ключ оценка 360.xlsx', ['Ключ', 'перевод обратных'])
+
+write_dataframe_to_excel(df_key, df_answer, struncture, 'template.xlsx', 'Ключ')
