@@ -5,7 +5,8 @@ from copy import deepcopy
 from pprint import pprint
 
 
-class Quiz
+class Quiz:
+    pass
 
 
 
