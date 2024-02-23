@@ -1,15 +1,10 @@
 import json
-
-import pandas
+import re
 import pandas as pd
-from copy import deepcopy
-
-from pprint import pprint
 
 
 class Quiz:
     pass
-
 
 
 def get_question_list(file_name, sheet_name):
@@ -20,11 +15,12 @@ def get_question_list(file_name, sheet_name):
     :return:
     '''
     df_key = pd.read_excel('ключ оценка 360.xlsx', sheet_name='данные')
-    list_of_questions = [line[0] for num, line in enumerate(df_key.values.tolist()) if str(line[0]) != 'nan']
+    list_of_questions = {int((a := re.split(r'(?<=\d)\. ', line[0]))[0]): a[1] for num, line in enumerate(df_key.values.tolist()) if  (str(line[0]) != 'nan' and num > 3)}
 
     return list_of_questions
 
-def get_question_groups(file_name:str, sheets:list):
+
+def get_question_groups(file_name: str, sheets: list):
     '''
         Получает данные из файда xlsx и формирует dict
 
@@ -58,8 +54,6 @@ def get_question_groups(file_name:str, sheets:list):
             claster_name = ''
             question_group = ''
 
-
-
         if str(line_key[1]) != 'nan' and str(line_key[2]) == 'nan':
             group_name = line_key[1]
             structure.setdefault(group_name, {})
@@ -86,16 +80,17 @@ def get_question_groups(file_name:str, sheets:list):
                 )
 
             list_of_answer = buffer.values()
-            average_answer = sum(list_of_answer)/len(list_of_answer)
+            average_answer = sum(list_of_answer) / len(list_of_answer)
             buffer.update(
                 {
-                    'AVG':round(average_answer, 4)
+                    'AVG': round(average_answer, 4)
                 }
             )
             structure[group_name][claster_name][question_group].update(buffer)
     return structure, df_key, df_answers
 
-def write_to_json(data:dict, file_name):
+
+def write_to_json(data: dict, file_name):
     '''
 
     :param data: structure : dict
@@ -115,12 +110,19 @@ def write_dataframe_to_excel(df_key, df_answer, structure, file_name, sheet_name
     :return:
     '''
     # line_answer[14:23]
-    d = df_key.to_numpy()
     for line_id in range(len(df_key)):
-        df_key.values[line_id][14:23] = df_answer[line_id][14:23]
+        df_key.values[line_id][14:23] = df_answer.values[line_id][14:23]
 
     df_key.to_excel(file_name, 'Ключ', index=False, header=False, merge_cells=True)
 
-struncture, df_key, df_answer = get_question_groups('ключ оценка 360.xlsx', ['Ключ', 'перевод обратных'])
 
-write_dataframe_to_excel(df_key, df_answer, struncture, 'template.xlsx', 'Ключ')
+def main():
+    d = get_question_list('ключ оценка 360.xlsx', 'данные')
+
+    struncture, df_key, df_answer = get_question_groups('ключ оценка 360.xlsx', ['Ключ', 'перевод обратных'])
+
+    write_dataframe_to_excel(df_key, df_answer, struncture, 'template.xlsx', 'Ключ')
+
+
+if __name__ == '__main__':
+    main()
