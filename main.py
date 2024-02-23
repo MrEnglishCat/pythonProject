@@ -114,15 +114,22 @@ def write_dataframe_to_excel(df_key, df_answer, structure, file_name, sheet_name
 
     for line_id in range(len(df_key)):
         buffer_df_key[line_id][14:23] = df_answer.values[line_id][14:23]
+        avg = []
+        for item in (a:=tuple(filter(lambda item: float(item) is not None , df_answer.values[line_id][14:23]))):
+            if str(item) != 'nan':
+                avg.append(int(item))
+
+
+        buffer_df_key[line_id][23] = round(sum(avg)/len(avg), 4) if len(avg) > 0 else 0
     df_key = pd.DataFrame(buffer_df_key)
     df_key.to_excel(file_name, 'Ключ', index=False, header=False, merge_cells=True)
 
 
 def main():
-    d = get_question_list('ключ оценка 360.xlsx', 'данные')
-
+    # get_question_list('ключ оценка 360.xlsx', 'данные')
+    #
     struncture, df_key, df_answer = get_question_groups('ключ оценка 360.xlsx', ['Ключ', 'перевод обратных'])
-
+    # write_to_json(struncture, 'key.json')
     write_dataframe_to_excel(df_key, df_answer, struncture, 'template.xlsx', 'Ключ')
 
 
